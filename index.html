@@ -12,6 +12,21 @@
             <h1 class="text-4xl font-extrabold text-center">
                 Anti Niki Social Club
             </h1>
+
+            <!-- Coupon redemption section -->
+            <div class="w-full max-w-md mx-auto">
+                <div id="coupon-success" class="hidden bg-green-500 text-white p-4 rounded-lg mb-4 text-center">
+                    <p class="font-bold">Coupon applied: 90% OFF + FREE DELIVERY!</p>
+                </div>
+                <div class="flex">
+                    <input type="text" id="coupon-input" placeholder="Enter coupon code" 
+                           class="flex-1 px-4 py-2 rounded-l-lg border border-slate-300 focus:outline-none focus:border-blue-500">
+                    <button id="apply-coupon" class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
+                        Apply
+                    </button>
+                </div>
+            </div>
+
             <div class="flex gap-8 flex-wrap justify-center">
                 <div class="rounded-xl shadow-xl border border-slate-400 p-8">
                     <img
@@ -27,7 +42,8 @@
                             the very special social club
                         </p>
                         <div class="flex justify-between items-end">
-                            <p>60.00 BGN</p>
+                            <p class="product-price" data-price="60.00">60.00 BGN</p>
+
                             <a
                                 href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                                 class="px-4 py-2 rounded bg-slate-200 hover:bg-slate-300 transition-colors"
@@ -51,7 +67,8 @@
                             the very special social club
                         </p>
                         <div class="flex justify-between items-end">
-                            <p>90.00 BGN</p>
+                            <!-- <p>90.00 BGN</p> -->
+                            <p class="product-price" data-price="90.00">90.00 BGN</p>
                             <a
                                 href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                                 class="px-4 py-2 rounded bg-slate-200 hover:bg-slate-300 transition-colors"
@@ -69,7 +86,9 @@
                     <h2 class="text-xl font-semibold">Ultimate Anti Niki Membership Card</h2>
                     <p class="max-w-sm">The legendary membership card signed by all founding members. Only 1 ever made.</p>
                     <div class="flex justify-between items-end">
-                      <p class="font-bold text-xl">9999.99 BGN</p>
+                      <!-- <p class="font-bold text-xl">9999.99 BGN</p> -->
+                      <p class="product-price font-bold text-xl" data-price="9999.99">9999.99 BGN</p>
+
                       <button class="px-4 py-2 rounded bg-gray-400 cursor-not-allowed" disabled>Sold Out</button>
                     </div>
                   </div>
@@ -89,6 +108,28 @@
                 
                 .niki-flop {
                     animation: nikiFlopAnimation 0.5s ease-in-out;
+                }
+                .shake-animation {
+                    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+                }
+                
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+
+                @keyframes screenShake {
+                    0%, 100% { transform: translateX(0); }
+                    10% { transform: translateX(-10px) rotate(-0.5deg); }
+                    20% { transform: translateX(9px) rotate(0.5deg); }
+                    30% { transform: translateX(-8px) rotate(-0.4deg); }
+                    40% { transform: translateX(7px) rotate(0.4deg); }
+                    50% { transform: translateX(-6px) rotate(-0.3deg); }
+                    60% { transform: translateX(5px) rotate(0.3deg); }
+                    70% { transform: translateX(-4px) rotate(-0.2deg); }
+                    80% { transform: translateX(3px) rotate(0.2deg); }
+                    90% { transform: translateX(-2px) rotate(-0.1deg); }
                 }
             </style>
 
@@ -188,6 +229,75 @@
               cursor.classList.remove('niki-flop');
             }, 500);
           });
+        });
+
+        // Coupon code functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const couponInput = document.getElementById('coupon-input');
+            const applyButton = document.getElementById('apply-coupon');
+            const couponSuccess = document.getElementById('coupon-success');
+            const validCouponCode = 'https://www.youtube.com/watch?v=OyCAN85hYDo&list=RDOyCAN85hYDo&start_radio=1';
+            let discountApplied = false;
+            
+            applyButton.addEventListener('click', function() {
+                const enteredCode = couponInput.value.trim();
+                
+                if (enteredCode.toLowerCase() === validCouponCode.toLowerCase()) {
+                    // Show success message
+                    couponSuccess.classList.remove('hidden');
+                    // Add screen shake effect
+                    document.body.style.animation = 'screenShake 0.8s ease-in-out';
+                    
+                    // Apply discount to all prices if not already applied
+                    if (!discountApplied) {
+                        const priceElements = document.querySelectorAll('.product-price');
+                        priceElements.forEach(priceEl => {
+                            const originalPrice = parseFloat(priceEl.dataset.price);
+                            const discountedPrice = (originalPrice * 0.1).toFixed(2); // 90% off
+                            
+                            // Store original price as previous text
+                            const originalPriceElement = document.createElement('span');
+                            originalPriceElement.className = 'line-through text-gray-500 text-sm mr-2';
+                            originalPriceElement.textContent = `${originalPrice.toFixed(2)} BGN`;
+                            
+                            // Update price text
+                            priceEl.innerHTML = '';
+                            priceEl.appendChild(originalPriceElement);
+                            priceEl.appendChild(document.createTextNode(`${discountedPrice} BGN`));
+                        });
+                        
+                        // Show confetti celebration
+                        confetti({
+                            particleCount: 200,
+                            spread: 100,
+                            origin: { y: 0.3 }
+                        });
+                        
+                        // Play buy sound
+                        const buySound = document.getElementById('buySound');
+                        buySound.currentTime = 0;
+                        buySound.play();
+                        
+                        discountApplied = true;
+                    }
+                } else {
+                    // Shake the input to indicate error
+                    couponInput.classList.add('shake-animation');
+                    setTimeout(() => couponInput.classList.remove('shake-animation'), 500);
+                    
+                    // Play error sound (you can add another sound for this)
+                    const thSound = document.getElementById('thSound');
+                    thSound.currentTime = 0;
+                    thSound.play();
+                }
+            });
+            
+            // Also apply coupon when pressing Enter in the input field
+            couponInput.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    applyButton.click();
+                }
+            });
         });
     </script>
 </html>
