@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <title>Anti Niki Social Club</title>
+        <link href="css/style.css" rel="stylesheet" />
+    </head>
+    <body class="bg-slate-50">
+        <main class="flex flex-col gap-24 py-24 items-center">
+            <h1 class="text-4xl font-extrabold text-center">
+                Anti Niki Social Club
+            </h1>
+            <div class="flex gap-8 flex-wrap justify-center">
+                <div class="rounded-xl shadow-xl border border-slate-400 p-8">
+                    <img
+                        src="front.webp"
+                        class="w-full mb-8 max-w-96 rounded-lg"
+                    />
+                    <div class="flex flex-col gap-4">
+                        <h2 class="text-xl font-semibold">
+                            Anti Niki Social Club Tee Front
+                        </h2>
+                        <p class="max-w-sm">
+                            This is a T-Shirt for all people that want to join
+                            the very special social club
+                        </p>
+                        <div class="flex justify-between items-end">
+                            <p>60.00 BGN</p>
+                            <a
+                                href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                                class="px-4 py-2 rounded bg-slate-200 hover:bg-slate-300 transition-colors"
+                                >Add to cart</a
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-xl shadow-xl border border-slate-400 p-8">
+                    <img
+                        src="back.webp"
+                        class="w-full mb-8 max-w-96 rounded-lg"
+                    />
+                    <div class="flex flex-col gap-4">
+                        <h2 class="text-xl font-semibold">
+                            Anti Niki Social Club Tee Back
+                        </h2>
+                        <p class="max-w-sm">
+                            This is a T-Shirt for all people that want to join
+                            the very special social club
+                        </p>
+                        <div class="flex justify-between items-end">
+                            <p>90.00 BGN</p>
+                            <a
+                                href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                                class="px-4 py-2 rounded bg-slate-200 hover:bg-slate-300 transition-colors"
+                                >Add to cart</a
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="container mx-auto py-12 text-center">
+            <h3 class="text-xl font-semibold mb-4">Join super exclusive club for FREE!</h3>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
+               class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors inline-block"
+               target="_blank">
+                Join now
+            </a>
+        </footer>
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        function celebrateAddToCart(event) {
+            event.preventDefault();
+            
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#f44336', '#2196f3', '#ffeb3b', '#4caf50', '#9c27b0']
+            });
+            
+            setTimeout(() => {
+                window.location.href = event.currentTarget.href;
+            }, 1000);
+        }
+        
+        // Add click handlers to all "Add to cart" buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const addToCartButtons = document.querySelectorAll('a');
+            addToCartButtons.forEach(button => {
+                if (button.textContent.trim() === 'Add to cart') {
+                    button.addEventListener('click', celebrateAddToCart);
+                }
+            });
+        });
+    </script>
+</html>
