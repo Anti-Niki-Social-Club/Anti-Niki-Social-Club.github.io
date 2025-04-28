@@ -77,9 +77,27 @@
 
             </div>
 
-            <div id="niki-cursor" style="position:fixed; pointer-events:none; z-index:1000; transform:translate(-50%, -50%); display:none;">
-              <img src="sm.webp" width="80" height="40" style="border-radius:50%;">
-            </div>
+            <style>
+                @keyframes nikiFlopAnimation {
+                    0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+                    20% { transform: translate(-50%, -50%) rotate(90deg) scale(1.2); }
+                    40% { transform: translate(-50%, -50%) rotate(180deg) scale(1.5) translateY(-20px); }
+                    60% { transform: translate(-50%, -50%) rotate(270deg) scale(1.3) translateY(10px); }
+                    80% { transform: translate(-50%, -50%) rotate(330deg) scale(1.1); }
+                    100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+                }
+                
+                .niki-flop {
+                    animation: nikiFlopAnimation 0.5s ease-in-out;
+                }
+            </style>
+
+          <div id="niki-cursor" style="position:fixed; pointer-events:none; z-index:1000; transform:translate(-50%, -50%); display:none;">
+            <img src="sm.webp" width="80" height="40" style="border-radius:50%;">
+          </div>
+
+            <audio id="thSound" src="th.mp3" preload="auto"></audio>
+            <audio id="buySound" src="buy.mp3" preload="auto"></audio>
 
             <div class="text-center mt-12">
               <p class="text-lg">People who avoided Niki today:</p>
@@ -113,6 +131,11 @@
     <script>
         function celebrateAddToCart(event) {
             event.preventDefault();
+
+            // Play buy sound
+            const buySound = document.getElementById('buySound');
+            buySound.currentTime = 0;
+            buySound.play();
             
             confetti({
                 particleCount: 100,
@@ -138,10 +161,32 @@
 
         document.addEventListener('DOMContentLoaded', function() {
           const cursor = document.getElementById('niki-cursor');
+          const thSound = document.getElementById('thSound');
+          
           document.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
             cursor.style.display = 'block';
+          });
+          
+          document.addEventListener('click', (e) => {
+            // Play the sound
+            thSound.currentTime = 0; // Reset sound to start
+            thSound.play();
+            
+            // Remove animation class if it exists
+            cursor.classList.remove('niki-flop');
+            
+            // Force browser to recognize the removal before adding it again
+            void cursor.offsetWidth;
+            
+            // Add animation class
+            cursor.classList.add('niki-flop');
+            
+            // Remove class after animation completes
+            setTimeout(() => {
+              cursor.classList.remove('niki-flop');
+            }, 500);
           });
         });
     </script>
