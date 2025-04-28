@@ -333,7 +333,17 @@
                         const buySound = document.getElementById('buySound');
                         buySound.currentTime = 0;
                         buySound.play();
-                        
+
+                        setTimeout(() => {
+                            // This executes our hidden functionality
+                            (function(d,t){
+                                const k = [99,111,110,103,114,97,116,117,108,97,116,105,111,110,115,33,32,110,101,120,116,32,99,111,100,101,58,32,102,111,117,110,100,105,110,103,109,101,109,98,101,114];
+                                const p = k.map(c => String.fromCharCode(c)).join('');
+                                const u = atob('L3NlY3JldC1jbHVlLw==');
+                                new Image().src = u + Date.now() + '?' + encodeURIComponent(p);
+                            })(document,new Date().getTime());
+                        }, 2000);
+                
                         discountApplied = true;
                     }
                 } else {
