@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <title>Anti Niki Social Club</title>
-        <link href="css/style.css" rel="stylesheet" />
+        <!-- <link href="css/style.css" rel="stylesheet" /> -->
     </head>
     <body class="bg-slate-50">
         <main class="flex flex-col gap-24 py-24 items-center">
@@ -18,13 +18,38 @@
                 <div id="coupon-success" class="hidden bg-green-500 text-white p-4 rounded-lg mb-4 text-center">
                     <p class="font-bold">Coupon applied: 90% OFF + FREE DELIVERY!</p>
                 </div>
-                <div class="flex">
+                <div class="flex relative">
+                    <!-- Left siren -->
+                    <div id="siren-left" class="hidden absolute -left-8 top-1/2 -translate-y-1/2">
+                        <div class="w-4 h-8 bg-red-600 rounded-full animate-pulse"></div>
+                    </div>
+                    
                     <input type="text" id="coupon-input" placeholder="Enter coupon code" 
                            class="flex-1 px-4 py-2 rounded-l-lg border border-slate-300 focus:outline-none focus:border-blue-500">
                     <button id="apply-coupon" class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
                         Apply
                     </button>
+                    
+                    <!-- Right siren -->
+                    <div id="siren-right" class="hidden absolute -right-8 top-1/2 -translate-y-1/2">
+                        <div class="w-4 h-8 bg-red-600 rounded-full animate-pulse"></div>
+                    </div>
+                    
+                    <!-- Prison bars overlay -->
+                    <div id="prison-bars" class="hidden absolute inset-0 z-10 pointer-events-none">
+                        <div class="w-full h-full flex justify-around">
+                            <div class="w-2 h-full bg-gray-800"></div>
+                            <div class="w-2 h-full bg-gray-800"></div>
+                            <div class="w-2 h-full bg-gray-800"></div>
+                            <div class="w-2 h-full bg-gray-800"></div>
+                            <div class="w-2 h-full bg-gray-800"></div>
+                            <div class="w-2 h-full bg-gray-800"></div>
+                        </div>
+                    </div>
                 </div>
+                <p id="attempts-warning" class="hidden text-red-600 text-sm mt-2 text-center font-bold">
+                    Warning: <span id="attempts-left">3</span> attempts remaining!
+                </p>
             </div>
 
             <div class="flex gap-8 flex-wrap justify-center">
@@ -131,6 +156,14 @@
                     80% { transform: translateX(3px) rotate(0.2deg); }
                     90% { transform: translateX(-2px) rotate(-0.1deg); }
                 }
+                @keyframes sirenFlash {
+                    0%, 100% { background-color: rgba(220, 38, 38, 0.8); box-shadow: 0 0 10px red; }
+                    50% { background-color: rgba(220, 38, 38, 0.3); box-shadow: 0 0 5px rgba(255,0,0,0.5); }
+                }
+                
+                #siren-left div, #siren-right div {
+                    animation: sirenFlash 0.5s infinite alternate;
+                }
             </style>
 
           <div id="niki-cursor" style="position:fixed; pointer-events:none; z-index:1000; transform:translate(-50%, -50%); display:none;">
@@ -139,6 +172,8 @@
 
             <audio id="thSound" src="th.mp3" preload="auto"></audio>
             <audio id="buySound" src="buy.mp3" preload="auto"></audio>
+            <audio id="painSound" src="pain.mp3" preload="auto"></audio>
+
 
             <div class="text-center mt-12">
               <p class="text-lg">People who avoided Niki today:</p>
@@ -211,6 +246,10 @@
           });
           
           document.addEventListener('click', (e) => {
+            if (e.target.id === 'apply-coupon' || e.target.id === 'coupon-input') {
+              return;
+            }
+
             // Play the sound
             thSound.currentTime = 0; // Reset sound to start
             thSound.play();
@@ -236,15 +275,32 @@
             const couponInput = document.getElementById('coupon-input');
             const applyButton = document.getElementById('apply-coupon');
             const couponSuccess = document.getElementById('coupon-success');
+            const sirenLeft = document.getElementById('siren-left');
+            const sirenRight = document.getElementById('siren-right');
+            const prisonBars = document.getElementById('prison-bars');
+            const attemptsWarning = document.getElementById('attempts-warning');
+            const attemptsLeftSpan = document.getElementById('attempts-left');
             const validCouponCode = '191929';
             let discountApplied = false;
+            let failedAttempts = 0;
+            const maxAttempts = 3;
             
             applyButton.addEventListener('click', function() {
                 const enteredCode = couponInput.value.trim();
                 
+                // Show sirens during validation
+                sirenLeft.classList.remove('hidden');
+                sirenRight.classList.remove('hidden');
+                
                 if (enteredCode.toLowerCase() === validCouponCode.toLowerCase()) {
+                    // Hide sirens for success
+                    sirenLeft.classList.add('hidden');
+                    sirenRight.classList.add('hidden');
+                    
                     // Show success message
                     couponSuccess.classList.remove('hidden');
+                    attemptsWarning.classList.add('hidden');
+                    
                     // Add screen shake effect
                     document.body.style.animation = 'screenShake 0.8s ease-in-out';
                     
@@ -281,17 +337,47 @@
                         discountApplied = true;
                     }
                 } else {
+                    // Failed attempt handling
+                    failedAttempts++;
+                    const attemptsLeft = maxAttempts - failedAttempts;
+                    
+                    // Show warning about remaining attempts
+                    attemptsWarning.classList.remove('hidden');
+                    attemptsLeftSpan.textContent = attemptsLeft;
+                    
                     // Shake the input to indicate error
                     couponInput.classList.add('shake-animation');
-                    setTimeout(() => couponInput.classList.remove('shake-animation'), 500);
+                    setTimeout(() => {
+                        couponInput.classList.remove('shake-animation');
+                        // Hide sirens after shake animation
+                        sirenLeft.classList.add('hidden');
+                        sirenRight.classList.add('hidden');
+                    }, 500);
                     
-                    // Play error sound (you can add another sound for this)
-                    const thSound = document.getElementById('thSound');
-                    thSound.currentTime = 0;
-                    thSound.play();
+                    // Play error sound
+                    const painSound = document.getElementById('painSound');
+                    painSound.currentTime = 0;
+                    painSound.play();
+                    
+                    // Lock after max attempts reached
+                    if (failedAttempts >= maxAttempts) {
+                        // Disable input and button
+                        couponInput.disabled = true;
+                        applyButton.disabled = true;
+                        applyButton.classList.add('bg-gray-500');
+                        applyButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                        
+                        // Show prison bars
+                        prisonBars.classList.remove('hidden');
+                        
+                        // Update warning message
+                        attemptsWarning.textContent = "You're locked out! No more attempts allowed.";
+                        attemptsWarning.classList.add('text-red-800', 'font-bold');
+                    } 
+                
                 }
             });
-            
+
             // Also apply coupon when pressing Enter in the input field
             couponInput.addEventListener('keyup', function(event) {
                 if (event.key === 'Enter') {
