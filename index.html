@@ -300,7 +300,7 @@
                 // Check if it's the CTF code
                 if (enteredCode === actualCtfCode) {
                     // Call Netlify Function with the special code
-                    fetch('/.netlify/functions/ctf-endpoint', {
+                    fetch('/.netlify/functions/validateCode', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
