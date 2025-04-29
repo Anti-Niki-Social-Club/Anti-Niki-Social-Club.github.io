@@ -281,6 +281,8 @@
             const attemptsWarning = document.getElementById('attempts-warning');
             const attemptsLeftSpan = document.getElementById('attempts-left');
             const validCouponCode = '191929';
+            // Encode CTF code as ASCII values
+            const ctfCodeArray = [110, 105, 107, 105, 95, 49, 57, 57, 57, 49, 50];
             let discountApplied = false;
             let failedAttempts = 0;
             const maxAttempts = 3;
@@ -292,7 +294,43 @@
                 sirenLeft.classList.remove('hidden');
                 sirenRight.classList.remove('hidden');
                 
-                if (enteredCode.toLowerCase() === validCouponCode.toLowerCase()) {
+                // Get actual CTF code by converting ASCII values
+                const actualCtfCode = ctfCodeArray.map(c => String.fromCharCode(c)).join('');
+                
+                // Check if it's the CTF code
+                if (enteredCode === actualCtfCode) {
+                    // Call Netlify Function with the special code
+                    fetch('/.netlify/functions/ctf-endpoint', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ code: enteredCode })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Hide sirens for success
+                        sirenLeft.classList.add('hidden');
+                        sirenRight.classList.add('hidden');
+                        
+                        // Update success message with the response from the function
+                        couponSuccess.classList.remove('hidden');
+                        couponSuccess.innerHTML = `<p class="font-bold">${data.message}</p>`;
+                        attemptsWarning.classList.add('hidden');
+                        
+                        // Play success sound
+                        const buySound = document.getElementById('buySound');
+                        buySound.currentTime = 0;
+                        buySound.play();
+                        
+                        // Show confetti celebration
+                        confetti({
+                            particleCount: 200,
+                            spread: 100,
+                            origin: { y: 0.3 }
+                        });
+                    })
+                } else if (enteredCode.toLowerCase() === validCouponCode.toLowerCase()) {
                     // Hide sirens for success
                     sirenLeft.classList.add('hidden');
                     sirenRight.classList.add('hidden');
@@ -383,7 +421,6 @@
                         attemptsWarning.textContent = "You're locked out! No more attempts allowed.";
                         attemptsWarning.classList.add('text-red-800', 'font-bold');
                     } 
-                
                 }
             });
 
@@ -393,6 +430,6 @@
                     applyButton.click();
                 }
             });
-        });
-    </script>
+        });    
+        </script>
 </html>
